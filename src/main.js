@@ -174,7 +174,10 @@ async function init() {
     const mapStackController = new MapStackController(viewer, {
       googleTileset: tileset,
       cesiumToken,
-      initialStack: tileset ? 'photoreal' : 'esri-imagery',
+      // Photoreal is blocked for EEA Google accounts; prefer the Bing
+      // satellite stack when an ion token is configured, otherwise the
+      // keyless Esri imagery that upstream uses as default.
+      initialStack: tileset ? 'photoreal' : (cesiumToken ? 'bing-aerial' : 'esri-imagery'),
       // Task 5 (height-datum fix): rebroadcast stack changes as a window
       // CustomEvent so data layers (CCTV per-regime ground resolution) can
       // react without coupling MapStackController to layer modules. Fires on
@@ -185,7 +188,10 @@ async function init() {
       },
       onError: (message) => console.warn('[MapStack]', message),
     });
-    await mapStackController.setStack(tileset ? 'photoreal' : 'esri-imagery', { silent: true });
+    await mapStackController.setStack(
+      tileset ? 'photoreal' : (cesiumToken ? 'bing-aerial' : 'esri-imagery'),
+      { silent: true },
+    );
 
     // Initialize the style manager (post-processing, HUD, locations, share links)
     const styleManager = new StyleManager(viewer, { mapStackController });
@@ -197,7 +203,7 @@ async function init() {
 
     // If no share link state, do default fly-to Austin
     if (!styleManager.hasShareState) {
-      loaderStatus.textContent = 'Flying to Austin, TX...';
+      loaderStatus.textContent = 'Flying to Germany...';
       flyToAustin(viewer);
     } else {
       loaderStatus.textContent = 'Restoring shared view...';

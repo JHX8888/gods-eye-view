@@ -47,12 +47,14 @@ export function flyToPreset(viewer, presetName, duration = 3.0) {
 }
 
 /**
- * Set camera to Austin on load with a cinematic fly-in.
+ * Set camera to Germany on load with a cinematic fly-in.
+ * (Kept under the historic flyToAustin name so upstream call sites and QA
+ * scripts keep working.)
  */
 export function flyToAustin(viewer) {
-  // Start from a high altitude, then fly down
+  // Start from a high altitude over central Europe, then fly down
   viewer.camera.setView({
-    destination: Cesium.Cartesian3.fromDegrees(-97.7431, 30.2672, 25000),
+    destination: Cesium.Cartesian3.fromDegrees(10.45, 51.16, 8000000),
     orientation: {
       heading: Cesium.Math.toRadians(0),
       pitch: Cesium.Math.toRadians(-90),
@@ -60,15 +62,10 @@ export function flyToAustin(viewer) {
     },
   });
 
-  // Cinematic fly-in after a brief pause
+  // Cinematic fly-in after a brief pause — frame all of Germany
   setTimeout(() => {
     viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(-97.7431, 30.2672, 600),
-      orientation: {
-        heading: Cesium.Math.toRadians(15),
-        pitch: Cesium.Math.toRadians(-30),
-        roll: 0.0,
-      },
+      destination: Cesium.Rectangle.fromDegrees(5.87, 47.27, 15.04, 55.06),
       duration: 4.0,
       easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
     });
